@@ -1,0 +1,4 @@
+S : A|BC|epsilon
+A : a|b|BC|AC|epsilon
+B : CA|CB|a|b
+C : a|b|S|epsilon
