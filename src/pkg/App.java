@@ -70,6 +70,27 @@ public class App {
         Parser parser = new Parser(TokenList);
         HashMap<String,ArrayList<Token>> hashMap = parser.parse();
         
+
+        for (String s : hashMap.keySet()) 
+        {
+            ArrayList<Token> ruleSetForRule = hashMap.get(s);
+            for (Token token : ruleSetForRule) {
+                if(!token.getTokenType().equals(Token.TokenType.EPSILON))
+                {
+                    String TokenString = token.getValue();
+                    for(int i = 0; i<TokenString.length(); i++)
+                    {
+                        if(Character.isUpperCase(TokenString.charAt(i)))
+                        {
+                            if(!hashMap.containsKey(Character.toString(TokenString.charAt(i))))
+                            {
+                                throw new Exception("Rule does not exist for nonterminal in rule: "+ s + ", Error in rule: "+ TokenString);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         /*
          * Logs the hashmap of rules.
          */
@@ -85,6 +106,8 @@ public class App {
                 }
             }
         }
+
+
     }
 
     

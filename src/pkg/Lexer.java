@@ -99,6 +99,7 @@ public class Lexer {
             if(Character.isLowerCase(StringGrouping.charAt(0)))
             {
                 TokenList.add(new Token(Token.TokenType.TERMINAL,StringGrouping));
+                StringGrouping = "";
             }
             else if(Character.isUpperCase(StringGrouping.charAt(0)))
             {
@@ -107,7 +108,7 @@ public class Lexer {
             }
             for(int i = 0; i< TokenList.size(); i++)
             {
-                if(TokenList.get(i).getValue().equals("epsilon"))
+                if(TokenList.get(i).getValue().equalsIgnoreCase("epsilon"))
                 {
                     TokenList.set(i, new Token(Token.TokenType.EPSILON, "EPSILON"));
                 }

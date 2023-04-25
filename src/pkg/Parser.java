@@ -42,7 +42,7 @@ public class Parser {
         return hashMap;
     }
     
-    //Recursively checks for each token and buils hashmap for later rule lookups.
+    //Recursively checks for each token and builds hashmap for later rule lookups.
     public HashMap<String,ArrayList<Token>> RuleRow() throws Exception
     {
         HashMap<String,ArrayList<Token>> RuleSet = new HashMap<>();
