@@ -11,18 +11,19 @@ public class Parser {
         this.TokenList = TokenList;
     }
 
+    //Checks for tokens and returns them so we can deal with tokens in the list
     public Token matchAndRemove(Token.TokenType tokenType)
     {
         if(TokenList.get(0).getTokenType().equals(tokenType))
         {
-            Token token = TokenList.remove(0);
-            return token;
+            return TokenList.remove(0);
         }
         else
         {
             return null;
         }
     }
+    //Peek to reduce the chance of nullpointer exceptions
     public Token peek()
     {
         if(TokenList.size() == 0)
@@ -30,6 +31,7 @@ public class Parser {
         return TokenList.get(0);
     }
 
+    //Recursively check for rules. Only adds if nonnull.
     public HashMap<String,ArrayList<Token>> parse() throws Exception
     {
         HashMap<String,ArrayList<Token>> hashMap = new HashMap<>();
@@ -40,7 +42,7 @@ public class Parser {
         return hashMap;
     }
     
-
+    //Recursively checks for each token and buils hashmap for later rule lookups.
     public HashMap<String,ArrayList<Token>> RuleRow() throws Exception
     {
         HashMap<String,ArrayList<Token>> RuleSet = new HashMap<>();

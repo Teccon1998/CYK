@@ -39,6 +39,9 @@ public class Lexer {
                         }
                         else if(c == ':')
                         {
+                            /*
+                             * Adds the nonterminal from the inital rule.
+                             */
                             TokenList.add(new Token(Token.TokenType.NONTERMINAL,StringGrouping));
                             TokenList.add(new Token(Token.TokenType.RULERELATION,":"));
                             StringGrouping = "";
@@ -64,6 +67,11 @@ public class Lexer {
                         }
                         else if(c == '|')
                         {
+                            /*
+                             * Rule is detected we want to take whatever grouping is found.
+                             * Create a rule based on the values in the stored string.
+                             * Determines the token type based on case of the stored String.
+                             */
                             if(StringGrouping.length() == 0)
                             {
                                 TokenList.add(new Token(Token.TokenType.RULERELATION,"|"));

@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class App {
     static Logger logger = Logger.getGlobal();
-    final static boolean LogSwitch = false;
+    final static boolean LogSwitch = false; //Global logging switch.
     public static void main(String args[]) throws Exception
     {
         /*
@@ -64,7 +64,9 @@ public class App {
                 logger.info(t.toString());
             }
         }
-        
+        /*
+         * Parses the tokens recursively to add them to a hashmap for usage later.
+         */
         Parser parser = new Parser(TokenList);
         HashMap<String,ArrayList<Token>> hashMap = parser.parse();
         
