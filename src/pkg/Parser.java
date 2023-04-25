@@ -67,6 +67,10 @@ public class Parser {
             {
                 Rules.add(matchAndRemove(Token.TokenType.EPSILON));
             }
+            else
+            {
+                throw new Exception("No valid token detected.");
+            }
         } 
         while (matchAndRemove(Token.TokenType.ENDOFLINE)== null);
         RuleSet.put(rule, Rules);
