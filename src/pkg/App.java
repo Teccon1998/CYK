@@ -11,7 +11,9 @@ public class App {
     final static boolean LogSwitch = false;
     public static void main(String args[]) throws Exception
     {
-
+        /*
+         * Logging Handler if logging is enabled
+         */
         if(LogSwitch)
         {
             FileHandler fh = new FileHandler("C://Users//alexa//OneDrive//Desktop//CYK Algorithm//src//pkg//Log.txt");  
@@ -21,7 +23,7 @@ public class App {
         }
 
         /*
-         * Start of 
+         * Start of CYK program
          */
 
         /*
@@ -51,7 +53,9 @@ public class App {
         } catch (Exception e) {
             System.exit(1);
         }
-
+        /*
+         * Logs the TokenList 
+         */
         if(LogSwitch)
         {
             logger.info("TokenList:");
@@ -63,6 +67,11 @@ public class App {
         
         Parser parser = new Parser(TokenList);
         HashMap<String,ArrayList<Token>> hashMap = parser.parse();
+        
+        /*
+         * Logs the hashmap of rules.
+         */
+        
         if(LogSwitch)
         {
             logger.info("HashMap of Rules:");
