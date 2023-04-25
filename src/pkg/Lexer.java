@@ -2,7 +2,7 @@ package pkg;
 import java.util.ArrayList;
 public class Lexer {
 
-    private enum State { RULE, RULESET,START};
+    private enum State {RULESET,START};
     private ArrayList<String> UnlexedStrings = new ArrayList<>();
     public Lexer(ArrayList<String> UnlexedStrings)
     {

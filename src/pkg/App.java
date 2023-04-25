@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class App {
     public static void main(String args[]) throws Exception
@@ -22,5 +23,9 @@ public class App {
         System.out.println(TokenList);
 
         Parser parser = new Parser(TokenList);
+        HashMap<String,ArrayList<Token>> hashMap = parser.parse();
+        System.out.println();
+        System.out.println();
+        System.out.println(hashMap);
     }
 }
