@@ -1,12 +1,17 @@
 package pkg;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.logging.*;
 public class Lexer {
 
     private enum State {RULESET,START};
     private ArrayList<String> UnlexedStrings = new ArrayList<>();
-    public Lexer(ArrayList<String> UnlexedStrings)
+    Logger logger;
+    public Lexer(ArrayList<String> UnlexedStrings,Logger logger)
     {
         this.UnlexedStrings = UnlexedStrings;
+        this.logger = logger;
     }
 
     public ArrayList<Token> Lex() throws Exception
@@ -49,7 +54,15 @@ public class Lexer {
                         }
                         else
                         {
-                            throw new Exception("No valid rule found. Exiting.");
+                            logger.severe("NO VALID RULE FOUND!!! EXITING!!!");
+                            StringWriter sw = new StringWriter();
+                            PrintWriter pw = new PrintWriter(sw);
+                            try {
+                                throw new Exception("No valid rule found. Exiting.");
+                            } catch (Exception e) {
+                                e.printStackTrace(pw);
+                                logger.severe(sw.toString());
+                            }
                         }
                         break;
                     case RULESET:

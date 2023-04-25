@@ -1,14 +1,19 @@
 package pkg;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.*;
 
 public class Parser {
     private ArrayList<Token> TokenList;
+    Logger logger;
 
-    public Parser(ArrayList<Token> TokenList)
+    public Parser(ArrayList<Token> TokenList,Logger logger)
     {
         this.TokenList = TokenList;
+        this.logger = logger;
     }
 
     //Checks for tokens and returns them so we can deal with tokens in the list
@@ -51,7 +56,19 @@ public class Parser {
         String rule = "";
         Token token = matchAndRemove(Token.TokenType.NONTERMINAL);
         if(token == null)
-            throw new Exception("No nonterminal detected. Exiting.");
+        {
+            logger.severe("No nonterminal detected. Exiting.");
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            try {
+                throw new Exception("No nonterminal detected. Exiting.");
+            } catch (Exception e) {
+                e.printStackTrace(pw);
+                logger.severe(sw.toString());
+            }
+        }
+            // logger.severe
+            // throw new Exception("No nonterminal detected. Exiting.");
         rule = token.getValue();
         if(matchAndRemove(Token.TokenType.RULERELATION)==null)
             throw new Exception("Improper Formatting. Next token must be a RULE RELATION SYMBOL");

@@ -1,5 +1,7 @@
 package pkg;
 import java.util.logging.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,11 +48,15 @@ public class App {
         /*
          * Lexes the strings input from the file.
          */
-        Lexer lexer = new Lexer(UnlexedStrings);
+        Lexer lexer = new Lexer(UnlexedStrings,logger);
         ArrayList<Token> TokenList = new ArrayList<>();
         try {
             TokenList.addAll(lexer.Lex());
         } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            logger.severe(sw.toString());
             System.exit(1);
         }
         /*
@@ -67,9 +73,12 @@ public class App {
         /*
          * Parses the tokens recursively to add them to a hashmap for usage later.
          */
-        Parser parser = new Parser(TokenList);
+        Parser parser = new Parser(TokenList,logger);
         HashMap<String,ArrayList<Token>> hashMap = parser.parse();
         
+        /*
+         * Checking that for each ruleset there exists a correpsonding key rule.
+         */
 
         for (String s : hashMap.keySet()) 
         {
@@ -84,7 +93,16 @@ public class App {
                         {
                             if(!hashMap.containsKey(Character.toString(TokenString.charAt(i))))
                             {
-                                throw new Exception("Rule does not exist for nonterminal in rule: "+ s + ", Error in rule: "+ TokenString);
+                                logger.severe("Rule does not exist for nonterminal in rule: "+ s + ", Error in rule: "+ TokenString);
+                                StringWriter sw = new StringWriter();
+                                PrintWriter pw = new PrintWriter(sw);
+                                try 
+                                {
+                                    throw new Exception("Rule does not exist for nonterminal in rule: "+ s + ", Error in rule: "+ TokenString);
+                                } catch (Exception e) {
+                                    e.printStackTrace(pw);
+                                    logger.severe(sw.toString());
+                                }
                             }
                         }
                     }
@@ -98,17 +116,54 @@ public class App {
         if(LogSwitch)
         {
             logger.info("HashMap of Rules:");
-            for (String s : hashMap.keySet()) {
-                logger.info(s+":");
-                for(Token t : hashMap.get(s))
+            for (String str : hashMap.keySet()) {
+                logger.info(str+":");
+                for(Token t : hashMap.get(str))
                 {
                     logger.info(t.getValue());
                 }
             }
         }
 
+        //Taking in an input string, peforming CYK
+        // Scanner tempScan = new Scanner(System.in);
+        // System.out.println("Enter the string you'd like to perform CYK on below: ");
+        // String inputStr = tempScan.nextLine();
+        String inputString = "aabaa";
+        HashMap<Character,ArrayList<String>> nonTermMap = new HashMap<Character, ArrayList<String>>();
+        if(inputString.equals("\n"))
+        {
+            throw new Exception("Input string must not be null.");
+        }
+        for(char tempChar : inputString.toCharArray())
+        {
+            ArrayList<String> temp = new ArrayList<>();
+            if(nonTermMap.containsKey(tempChar))
+            {
+                continue;
+            }
+            for (String s : hashMap.keySet()) 
+            {
+                //redundancy check
+                
+                for(Token t : hashMap.get(s))
+                {
+                    if(t.getTokenType().equals(Token.TokenType.TERMINAL))
+                    {
+                        if(t.getValue().charAt(0) == tempChar)
+                        {
+                            temp.add(s);
+                            nonTermMap.put(tempChar, temp);
+                            break;
+                        }
+                    }
+                }    
+                
+            }
 
+        }
+        System.out.println();
+        
     }
-
-    
 }
+
