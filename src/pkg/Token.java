@@ -2,7 +2,7 @@ package pkg;
 public class Token {
     public enum TokenType 
     {
-        TERMINAL,NONTERMINAL,EPSILON,ENDOFLINE,SEPARATOR,RULERELATION
+        TERMINAL,NONTERMINAL,EPSILON,ENDOFLINE,SEPARATOR,RULERELATION,INPUTSTRING
     }
 
     private TokenType TokType;

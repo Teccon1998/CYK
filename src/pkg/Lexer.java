@@ -62,6 +62,7 @@ public class Lexer {
                             } catch (Exception e) {
                                 e.printStackTrace(pw);
                                 logger.severe(sw.toString());
+                                System.exit(1);
                             }
                         }
                         break;
@@ -109,15 +110,19 @@ public class Lexer {
                 }
                 
             }
-            if(Character.isLowerCase(StringGrouping.charAt(0)))
+            if(StringGrouping.length() != 0)
             {
-                TokenList.add(new Token(Token.TokenType.TERMINAL,StringGrouping));
-                StringGrouping = "";
-            }
-            else if(Character.isUpperCase(StringGrouping.charAt(0)))
-            {
-                TokenList.add(new Token(Token.TokenType.NONTERMINAL,StringGrouping));
-                StringGrouping = "";
+                if(Character.isLowerCase(StringGrouping.charAt(0)))
+                {
+                    TokenList.add(new Token(Token.TokenType.TERMINAL,StringGrouping));
+                    StringGrouping = "";
+                }
+                else if(Character.isUpperCase(StringGrouping.charAt(0)))
+                {
+                    TokenList.add(new Token(Token.TokenType.NONTERMINAL,StringGrouping));
+                    StringGrouping = "";
+                }
+                TokenList.add(new Token(Token.TokenType.ENDOFLINE,"EOL"));
             }
             for(int i = 0; i< TokenList.size(); i++)
             {
@@ -125,8 +130,12 @@ public class Lexer {
                 {
                     TokenList.set(i, new Token(Token.TokenType.EPSILON, "EPSILON"));
                 }
+
+                if(TokenList.get(i).getValue().equalsIgnoreCase("inputString"))
+                {
+
+                }
             }
-            TokenList.add(new Token(Token.TokenType.ENDOFLINE,"EOL"));
         }
         return TokenList;
     }

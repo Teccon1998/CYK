@@ -65,13 +65,23 @@ public class Parser {
             } catch (Exception e) {
                 e.printStackTrace(pw);
                 logger.severe(sw.toString());
+                System.exit(1);
             }
         }
-            // logger.severe
-            // throw new Exception("No nonterminal detected. Exiting.");
         rule = token.getValue();
         if(matchAndRemove(Token.TokenType.RULERELATION)==null)
-            throw new Exception("Improper Formatting. Next token must be a RULE RELATION SYMBOL");
+        {
+            logger.severe("Improper Formatting. Next token must be a RULE RELATION SYMBOL");
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            try {
+                throw new Exception("Improper Formatting. Next token must be a RULE RELATION SYMBOL");
+            } catch (Exception e) {
+                e.printStackTrace(pw);
+                logger.severe(sw.toString());
+                System.exit(1);
+            }
+        }
         do 
         {
             if(peek().getTokenType().equals(Token.TokenType.NONTERMINAL))

@@ -5,12 +5,11 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class App {
     static Logger logger = Logger.getGlobal();
-    final static boolean LogSwitch = false; //Global logging switch.
+    final static boolean LogSwitch = true; //Global logging switch.
     public static void main(String args[]) throws Exception
     {
         /*
@@ -23,7 +22,6 @@ public class App {
             SimpleFormatter formatter = new SimpleFormatter(); 
             fh.setFormatter(formatter);  
         }
-
         /*
          * Start of CYK program
          */
@@ -44,6 +42,9 @@ public class App {
                 logger.info(s);
             }
         }
+
+
+
 
         /*
          * Lexes the strings input from the file.
@@ -70,6 +71,10 @@ public class App {
                 logger.info(t.toString());
             }
         }
+
+
+
+        
         /*
          * Parses the tokens recursively to add them to a hashmap for usage later.
          */
@@ -102,6 +107,7 @@ public class App {
                                 } catch (Exception e) {
                                     e.printStackTrace(pw);
                                     logger.severe(sw.toString());
+                                    System.exit(1);
                                 }
                             }
                         }
@@ -109,6 +115,10 @@ public class App {
                 }
             }
         }
+        
+        
+        
+        
         /*
          * Logs the hashmap of rules.
          */
@@ -124,17 +134,31 @@ public class App {
                 }
             }
         }
-
-        //Taking in an input string, peforming CYK
-        // Scanner tempScan = new Scanner(System.in);
-        // System.out.println("Enter the string you'd like to perform CYK on below: ");
-        // String inputStr = tempScan.nextLine();
+        /*
+         * Inputting string for 
+         */
         String inputString = "aabaa";
         HashMap<Character,ArrayList<String>> nonTermMap = new HashMap<Character, ArrayList<String>>();
         if(inputString.equals("\n"))
         {
-            throw new Exception("Input string must not be null.");
+            logger.severe("Input string must not be null.");
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            try 
+            {
+                throw new Exception("Input String must not be null.");
+            } 
+            catch (Exception e) 
+            {
+                e.printStackTrace(pw);
+                logger.severe(sw.toString());
+                System.exit(1);
+            }
         }
+
+        /*
+         * Creates another map for terminals and all the rules that contain that nonterminal. 
+         */
         for(char tempChar : inputString.toCharArray())
         {
             ArrayList<String> temp = new ArrayList<>();
@@ -144,8 +168,6 @@ public class App {
             }
             for (String s : hashMap.keySet()) 
             {
-                //redundancy check
-                
                 for(Token t : hashMap.get(s))
                 {
                     if(t.getTokenType().equals(Token.TokenType.TERMINAL))
@@ -153,17 +175,30 @@ public class App {
                         if(t.getValue().charAt(0) == tempChar)
                         {
                             temp.add(s);
+                            //add the rule and it's corresponding relation into a hashmap
                             nonTermMap.put(tempChar, temp);
                             break;
                         }
                     }
                 }    
-                
-            }
 
+            }
         }
-        System.out.println();
-        
+
+        char a = 'a';
+        char b = 'b';
+        System.out.println(cartesian(nonTermMap.get(a),nonTermMap.get(b)));
+    }
+
+    public static ArrayList<String> cartesian(ArrayList<String> arr1, ArrayList<String> arr2)
+    {
+        ArrayList<String> result = new ArrayList<>();
+        for (String str1 : arr1) {
+            for (String str2 : arr2) {
+                result.add(str1 + str2);
+            }
+        }
+        return result;
     }
 }
 
