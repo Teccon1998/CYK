@@ -15,4 +15,4 @@ Every single non-terminal follows the rules of CNF. Every terminal can be derive
 Following this same pattern is your input string. Your input string should fit the language you want to derive it from.
 So a string like "aba" would work for the grammar above. A word w = " aa " works for the above CFG, while something like "vv" clearly does not. 
 
-Be sure to change the path variable in the App.java file to the correct path relative to the file system on your machine.
+Be sure to change the path variable in the App.java file (line 65) to the correct path relative to the file system on your machine.
