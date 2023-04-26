@@ -1,5 +1,6 @@
 package pkg;
 import java.util.logging.*;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -22,6 +23,36 @@ public class App {
             SimpleFormatter formatter = new SimpleFormatter(); 
             fh.setFormatter(formatter);  
         }
+        ArrayList<Token> TokenList = Lex();    
+        String inputString = TokenList.remove(0).getValue();  
+        HashMap<String,ArrayList<Token>> hashMap = parse(TokenList);  
+        HashMap<Character,ArrayList<String>> nonTermMap = NonTermMap(inputString,hashMap);
+        if(terminalNotExistsFromInput(inputString,nonTermMap))
+        {
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                logger.severe("InputString contains a terminal that is not part of the language.");
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                logger.severe(sw.toString());
+                System.exit(1);
+            }
+        }
+        ArrayList<String> List = new ArrayList<String>(Collections.fill(10, 10););
+
+        System.out.println("Content of ArrayList:"+List);
+        // for(int i = 0; i < inputString.length(); i++)
+        // {
+        //     Character c = inputString.charAt(i);
+        //     aStrings.se
+        // }
+        System.out.println(List);
+    }
+
+    public static ArrayList<Token>Lex() throws IOException
+    {
         /*
          * Start of CYK program
          */
@@ -42,10 +73,6 @@ public class App {
                 logger.info(s);
             }
         }
-
-
-
-
         /*
          * Lexes the strings input from the file.
          */
@@ -71,20 +98,17 @@ public class App {
                 logger.info(t.toString());
             }
         }
-
-
-
-        
-        /*
-         * Parses the tokens recursively to add them to a hashmap for usage later.
-         */
+        return TokenList;
+    }
+    
+    public static HashMap<String,ArrayList<Token>> parse(ArrayList<Token> TokenList) throws Exception
+    {
+        //Parses each line into a hashmap of rules.
         Parser parser = new Parser(TokenList,logger);
         HashMap<String,ArrayList<Token>> hashMap = parser.parse();
-        
         /*
-         * Checking that for each ruleset there exists a correpsonding key rule.
-         */
-
+        * Checking that for each ruleset there exists a correpsonding key rule.
+        */
         for (String s : hashMap.keySet()) 
         {
             ArrayList<Token> ruleSetForRule = hashMap.get(s);
@@ -115,14 +139,9 @@ public class App {
                 }
             }
         }
-        
-        
-        
-        
         /*
-         * Logs the hashmap of rules.
-         */
-        
+        * Logs the hashmap of rules.
+        */
         if(LogSwitch)
         {
             logger.info("HashMap of Rules:");
@@ -134,10 +153,14 @@ public class App {
                 }
             }
         }
+        return hashMap;
+    }    
+    
+    public static HashMap<Character,ArrayList<String>> NonTermMap(String inputString, HashMap<String,ArrayList<Token>> hashMap)
+    {
         /*
          * Inputting string for 
          */
-        String inputString = "aabaa";
         HashMap<Character,ArrayList<String>> nonTermMap = new HashMap<Character, ArrayList<String>>();
         if(inputString.equals("\n"))
         {
@@ -184,12 +207,9 @@ public class App {
 
             }
         }
-
-        char a = 'a';
-        char b = 'b';
-        System.out.println(cartesian(nonTermMap.get(a),nonTermMap.get(b)));
+        return nonTermMap;
     }
-
+    
     public static ArrayList<String> cartesian(ArrayList<String> arr1, ArrayList<String> arr2)
     {
         ArrayList<String> result = new ArrayList<>();
@@ -199,6 +219,23 @@ public class App {
             }
         }
         return result;
+    }
+    
+    public static boolean terminalNotExistsFromInput(String inpuString,HashMap<Character,ArrayList<String>> nonTermMap)
+    {
+        for(char c : inpuString.toCharArray())
+        {
+            if(nonTermMap.containsKey(c))
+            {
+                continue;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
+        return false;
     }
 }
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.logging.*;
 public class Lexer {
 
-    private enum State {RULESET,START};
+    private enum State {RULESET,START,INPUTSTRING};
     private ArrayList<String> UnlexedStrings = new ArrayList<>();
     Logger logger;
     public Lexer(ArrayList<String> UnlexedStrings,Logger logger)
@@ -27,12 +27,28 @@ public class Lexer {
              * That will be taken care of in the parser.
              */
             String StringGrouping = "";
-            State state = State.START; 
+            State state = State.INPUTSTRING; 
+            if(TokenList.size()!=0 && TokenList.get(0).getTokenType().equals(Token.TokenType.INPUTSTRING))
+            {
+                state = State.START;
+            }
             for(int i = 0; i< str.length(); i++)
             {
                 Character c = str.charAt(i);
                 switch(state)
                 {
+                    case INPUTSTRING:
+                        if(Character.isLowerCase(c)||c==':')
+                        {
+                            StringGrouping +=c;
+                        }
+                        if(i+1 == str.length())
+                        {
+                            TokenList.add(new Token(Token.TokenType.INPUTSTRING, StringGrouping.split(":")[1]));
+                            StringGrouping = "";
+                            state = State.START;
+                        }
+                        break;
                     case START:
                         if(Character.isUpperCase(c))
                         {
@@ -107,6 +123,7 @@ public class Lexer {
                             }
                         }
                         break;
+                    
                 }
                 
             }

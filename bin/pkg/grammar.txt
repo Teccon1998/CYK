@@ -1,3 +1,4 @@
+input:aabaa
 S : AC|BC|epsilon
 A : a|b|BC|AC|epsilon
 B : CA|CB|a|b
