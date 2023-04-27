@@ -1,0 +1,6 @@
+input:aabb
+C : AZ | epsilon
+S : AZ
+Z : SB | b
+A : a
+B : b
