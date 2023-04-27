@@ -11,6 +11,7 @@ import java.util.*;
 public class App {
     static Logger logger = Logger.getGlobal();
     final static boolean LogSwitch = true; //Global logging switch.
+    
     public static void main(String args[]) throws Exception
     {
         /*
@@ -40,16 +41,69 @@ public class App {
                 System.exit(1);
             }
         }
-        ArrayList<String> List = new ArrayList<String>(Collections.fill(10, 10););
 
-        System.out.println("Content of ArrayList:"+List);
-        // for(int i = 0; i < inputString.length(); i++)
-        // {
-        //     Character c = inputString.charAt(i);
-        //     aStrings.se
-        // }
-        System.out.println(List);
+        ArrayList<ArrayList<ArrayList<String>>> CYKMap = new ArrayList<>();
+
+        //size init of triangle table
+        for(int i = 0; i < inputString.length(); i++)
+        {
+            CYKMap.add(new ArrayList<ArrayList<String>>());
+            
+            for(int j = 0; j <= i; j++)
+            {
+                CYKMap.get(i).add(new ArrayList<String>());
+            }
+        }
+        for(int i = 0; i < inputString.length(); i++)
+        {
+            for(int k = 0; k < nonTermMap.get(inputString.charAt(i)).size(); k++)
+            {
+                CYKMap.get(i).get(i).add(nonTermMap.get(inputString.charAt(i)).get(k));
+            }
+        }
+
+        for(int k = 1; k < inputString.length(); k++)
+        {
+            for(int i = k, j =0 ; i < inputString.length(); i++, j++)
+            {
+                CYKMap = CYKSquare(j, i,CYKMap,hashMap);
+            }
+        }
+        System.out.println("Final");
     }
+
+    public static ArrayList<ArrayList<ArrayList<String>>> CYKSquare(int i, int j,ArrayList<ArrayList<ArrayList<String>>> CYKMap,HashMap<String,ArrayList<Token>> Ruleset)
+    {
+        ArrayList<String> UnionedRules = new ArrayList<>();
+        for(int l = i, m=i+1; m<=j; l++,m++)
+        {
+            System.out.println(i + " " + l + " " + m + " "+ j);
+            ArrayList<String> CartesianedRules = cartesian(CYKMap.get(l).get(i),CYKMap.get(j).get(m));
+            for (String string : CartesianedRules) 
+            {
+                UnionedRules.add(string);    
+            }
+        }
+        for(String str : UnionedRules)
+        {
+            for(String s : Ruleset.keySet())
+            {
+                for(Token t : Ruleset.get(s))
+                {
+                    if(t.getValue().equals(str))
+                    {
+                        if(!CYKMap.get(j).get(i).contains(s))
+                        {
+                            CYKMap.get(j).get(i).add(s);
+                        };
+                        break;
+                    }
+                }
+            }
+        }
+        return CYKMap;   
+    }
+    
 
     public static ArrayList<Token>Lex() throws IOException
     {

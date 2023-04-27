@@ -1,7 +1,6 @@
-input:aabaa
-S : AC|BC|epsilon
-A : a|b|BC|AC|epsilon
-B : CA|CB|a|b
-C : a|b|S|DE|epsilon
-D : a
-E : b
+input:aabb
+C : AZ | epsilon
+S : AZ
+Z : SB | b
+A : a
+B : b
