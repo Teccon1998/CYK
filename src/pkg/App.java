@@ -26,7 +26,8 @@ public class App {
         }
         ArrayList<Token> TokenList = Lex();    
         String inputString = TokenList.remove(0).getValue();  
-        HashMap<String,ArrayList<Token>> hashMap = parse(TokenList);  
+        HashMap<String,ArrayList<Token>> hashMap = parse(TokenList);
+        String StartRule = "C";//TODO:Find the start rule from the tokenList
         HashMap<Character,ArrayList<String>> nonTermMap = NonTermMap(inputString,hashMap);
         if(terminalNotExistsFromInput(inputString,nonTermMap))
         {
@@ -41,7 +42,22 @@ public class App {
                 System.exit(1);
             }
         }
-
+        ArrayList<ArrayList<ArrayList<String>>> CYKMap = createCYKMap(inputString, hashMap, nonTermMap);
+        if(CYKMap.get(CYKMap.size()-1).get(0).contains(StartRule))
+        {
+            System.out.println("THIS STRING IS IN THIS LANGUAGE.");
+        }
+        else
+        {
+            System.out.println("THIS STRING IS NOT IN THE LANGUAGE.");
+        }
+    }
+    /*
+     * This is super annoying implementation, but it WORKS!
+     * You initalize the first row. Then call 
+     */
+    public static ArrayList<ArrayList<ArrayList<String>>> createCYKMap(String inputString, HashMap<String,ArrayList<Token>> hashMap, HashMap<Character,ArrayList<String>> nonTermMap)
+    {
         ArrayList<ArrayList<ArrayList<String>>> CYKMap = new ArrayList<>();
 
         //size init of triangle table
@@ -54,14 +70,40 @@ public class App {
                 CYKMap.get(i).add(new ArrayList<String>());
             }
         }
+        logger.info("Length of input String: "+inputString.length());
+        logger.info("Length of inital row: "+CYKMap.size());
+        //Initalize the first row of the table.
         for(int i = 0; i < inputString.length(); i++)
         {
             for(int k = 0; k < nonTermMap.get(inputString.charAt(i)).size(); k++)
             {
                 CYKMap.get(i).get(i).add(nonTermMap.get(inputString.charAt(i)).get(k));
             }
+            String loggerString = "Rules for X_"+i+","+i+": ";
+            int p=0;
+            for(String str : nonTermMap.get(inputString.charAt(i)))
+            {
+                p++;
+                if(nonTermMap.get(inputString.charAt(i)).size()==0)
+                {
+                    loggerString += "0";
+                }
+                else if(nonTermMap.get(inputString.charAt(i)).size()==1)
+                {
+                    loggerString += str;
+                }
+                else if(p==nonTermMap.get(inputString.charAt(i)).size())
+                {
+                    loggerString += str;
+                }
+                else
+                {
+                    loggerString += str +", ";
+                }
+            }
+            logger.info(loggerString);
         }
-
+        //For each next row these two for loops run every other column and row in a triangle order.
         for(int k = 1; k < inputString.length(); k++)
         {
             for(int i = k, j =0 ; i < inputString.length(); i++, j++)
@@ -69,21 +111,82 @@ public class App {
                 CYKMap = CYKSquare(j, i,CYKMap,hashMap);
             }
         }
-        System.out.println("Final");
+
+        // printCYKMAP(CYKMap); //TODO: Need a more efficient way of printing this garbage.
+        return CYKMap;
+    }
+
+    public static void printCYKMAP(ArrayList<ArrayList<ArrayList<String>>> CYKMap)
+    {
+        //TODO:Make this not shit.
+        System.out.print("| ");
+        for(int i = 0; i < CYKMap.size(); i++)
+        {
+            for(String s : CYKMap.get(i).get(i))
+            {
+                System.out.print(s + " ");
+            }    
+            System.out.print(" | ");
+
+        }
+
+        
+        System.out.println();
+
+        
+        System.out.print("| ");
+        for(int k = 1; k < CYKMap.size(); k++)
+        {
+            for(int i = k, j =0 ; i < CYKMap.size(); i++, j++)
+            {
+                if(CYKMap.get(i).get(j).size() == 0)
+                {
+                    System.out.print("0 ");
+                }
+                for(String s : CYKMap.get(i).get(j))
+                {
+                    System.out.print(s + " ");
+                }
+                
+                System.out.print(" | ");
+            }
+            
+            System.out.println();
+        }
+
     }
 
     public static ArrayList<ArrayList<ArrayList<String>>> CYKSquare(int i, int j,ArrayList<ArrayList<ArrayList<String>>> CYKMap,HashMap<String,ArrayList<Token>> Ruleset)
     {
         ArrayList<String> UnionedRules = new ArrayList<>();
-        for(int l = i, m=i+1; m<=j; l++,m++)
+        int l = i;
+        int log = i+1;
+        String cartesianLog = "Cartesian of X_"+(l+1)+","+(i+1) + " and X_"+(j+1)+","+(log+1)+": ";
+        for(int m = i+1; m<=j; m++)
         {
-            System.out.println(i + " " + l + " " + m + " "+ j);
             ArrayList<String> CartesianedRules = cartesian(CYKMap.get(l).get(i),CYKMap.get(j).get(m));
+            
             for (String string : CartesianedRules) 
             {
-                UnionedRules.add(string);    
+                cartesianLog += string+", ";
+                UnionedRules.add(string);
             }
+            l++;
+            log++;
         }
+        if(UnionedRules.size() == 0)
+        {
+            cartesianLog += ": NULL";
+        }
+        else
+        {
+            cartesianLog = cartesianLog.substring(0,cartesianLog.length()-2);
+        }
+        logger.info(cartesianLog);
+
+        String loggerRuleExists = "Rules containing Cartesian: ";
+        int logString = loggerRuleExists.length();
+       
         for(String str : UnionedRules)
         {
             for(String s : Ruleset.keySet())
@@ -92,6 +195,7 @@ public class App {
                 {
                     if(t.getValue().equals(str))
                     {
+                        loggerRuleExists += s+", ";
                         if(!CYKMap.get(j).get(i).contains(s))
                         {
                             CYKMap.get(j).get(i).add(s);
@@ -101,6 +205,16 @@ public class App {
                 }
             }
         }
+        if(loggerRuleExists.length() == logString)
+        {
+            loggerRuleExists += "NULL";
+        }
+        else
+        {
+            loggerRuleExists = loggerRuleExists.substring(0, loggerRuleExists.length()-2);
+        }
+        logger.info(loggerRuleExists);
+        logger.info("Adding these to location: X_"+(i+1)+","+(j+1));
         return CYKMap;   
     }
     
