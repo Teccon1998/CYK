@@ -1,0 +1,3 @@
+bin/*
+bin/pkg/*
+tests/Log.txt
