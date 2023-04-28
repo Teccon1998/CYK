@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class App {
     final static boolean LogSwitch = true; //Global logging switch.
     static Logger logger = Logger.getGlobal();
-
+    public static String StartRule = "";
     public static void main(String[] args) throws Exception {
         /*
          * Logging Handler if logging is enabled
@@ -38,7 +38,7 @@ public class App {
         ArrayList<Token> TokenList = Lex();
         String inputString = TokenList.remove(0).getValue();
         HashMap<String, ArrayList<Token>> hashMap = parse(TokenList);
-        String StartRule = findStartRule(hashMap);
+        StartRule = findStartRule(hashMap);
         HashMap<Character, ArrayList<String>> nonTermMap = NonTermMap(inputString, hashMap);
         if (terminalNotExistsFromInput(inputString, nonTermMap)) {
             try {
@@ -61,6 +61,8 @@ public class App {
             System.out.println("THIS STRING IS NOT IN THE LANGUAGE.");
             Logger.getGlobal().info("THIS STRING IS NOT IN THE LANGUAGE.");
         }
+        // Get the starting rule
+        String startRule = getStartRule();
 
         LocalDateTime endTime = LocalDateTime.now();
         logger.info("End of program.");
@@ -83,6 +85,9 @@ public class App {
         }
         // If no rule with an epsilon transition is found, return the first rule in the HashMap as the starting rule
         return hashMap.keySet().iterator().next();
+    }
+    public static String getStartRule() {
+        return StartRule;
     }
     
 

@@ -5,6 +5,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import static pkg.App.StartRule;
+import static pkg.App.getStartRule;
 import static pkg.Token.TokenType.*;
 
 public class Lexer {
@@ -34,6 +36,10 @@ public class Lexer {
 
         ArrayList<Token> TokenList = new ArrayList<>();
         //We need to loop over each string in the list
+        // log start char
+        logger.info("Starting Lexing");
+        // start state
+        logger.info( "Starting Rule: " + getStartRule());
         for (String str : this.UnlexedStrings) {
             /*
              * Need to loop over each character. Cases checking for every style of grammar input.
@@ -59,7 +65,7 @@ public class Lexer {
                         }
                     }
                     case START -> {
-                        if (Character.isUpperCase(c)) {
+                        if (Character.isUpperCase(c) || Character.isDigit(c)) {
                             StringGrouping.append(c);
                         } else if (Character.isWhitespace(c)) {
                             //Do nothing, we dont want to create a lexeme for nothing.
@@ -72,11 +78,11 @@ public class Lexer {
                             StringGrouping = new StringBuilder();
                             state = State.RULESET;
                         } else {
-                            LogOut(logger, "NO VALID RULE FOUND!!! EXITING!!!", "No valid rule found. Exiting.");
+                            LogOut(logger, "NO VALID RULE FOUND!!! EXITING!!!", "No valid rule found. Exiting. Start char: " +  App.getStartRule());
                         }
                     }
                     case RULESET -> {
-                        if (Character.isUpperCase(c)) {
+                        if (Character.isUpperCase(c) || Character.isDigit(c)) {
                             StringGrouping.append(c);
                         } else if (Character.isLowerCase(c)) {
                             StringGrouping.append(c);
@@ -93,7 +99,7 @@ public class Lexer {
                             } else if (Character.isLowerCase(StringGrouping.charAt(0))) {
                                 TokenList.add(new Token(TERMINAL, StringGrouping.toString()));
                                 StringGrouping = new StringBuilder();
-                            } else if (Character.isUpperCase(StringGrouping.charAt(0))) {
+                            } else if (Character.isUpperCase(StringGrouping.charAt(0)) || Character.isDigit(StringGrouping.charAt(0))) {
                                 TokenList.add(new Token(NONTERMINAL, StringGrouping.toString()));
                                 StringGrouping = new StringBuilder();
                             } else {
@@ -108,7 +114,7 @@ public class Lexer {
                 if (Character.isLowerCase(StringGrouping.charAt(0))) {
                     TokenList.add(new Token(TERMINAL, StringGrouping.toString()));
                     StringGrouping = new StringBuilder();
-                } else if (Character.isUpperCase(StringGrouping.charAt(0))) {
+                } else if (Character.isUpperCase(StringGrouping.charAt(0)) || Character.isDigit(StringGrouping.charAt(0))) {
                     TokenList.add(new Token(NONTERMINAL, StringGrouping.toString()));
                     StringGrouping = new StringBuilder();
                 }
