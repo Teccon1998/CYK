@@ -6,6 +6,9 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.FileHandler;
@@ -21,6 +24,7 @@ public class App {
         /*
          * Logging Handler if logging is enabled
          */
+        LocalDateTime startTime = LocalDateTime.now();
         if (LogSwitch) {
             String projectDir = System.getProperty("user.dir");
             String logFilePath = projectDir + "/tests/Log.txt";
@@ -52,6 +56,12 @@ public class App {
         } else {
             System.out.println("THIS STRING IS NOT IN THE LANGUAGE.");
         }
+
+        LocalDateTime endTime = LocalDateTime.now();
+
+    // Calculate the time elapsed and log it
+        Duration timeElapsed = Duration.between(startTime, endTime);
+        logger.info("Time elapsed for the entire program: " + timeElapsed.toMillis() + " milliseconds");
     }
 
     /*
@@ -106,49 +116,62 @@ public class App {
         return CYKMap;
     }
 
+
     public static String printCYKMAP(ArrayList<ArrayList<ArrayList<String>>> CYKMap) {
-        String sb = "";
+        StringBuilder sb = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // Add start time and date stamp
+        sb.append("CYKMap printed on: ").append(LocalDateTime.now().format(formatter)).append("\n");
+
         // Print the top row
-        System.out.print("|   ");
+        sb.append("|   ");
         for (int i = 0; i < CYKMap.size(); i++) {
-            System.out.printf("| %d   ", i);
+            sb.append(String.format("| %d   ", i));
         }
-        System.out.println("|");
+        sb.append("|\n");
 
         // Print the separator
-        System.out.print("|---");
+        sb.append("|---");
         for (int i = 0; i < CYKMap.size(); i++) {
-            System.out.print("|-----");
+            sb.append("|-----");
         }
-        System.out.println("|");
+        sb.append("|\n");
 
         // Print the main table
         for (int i = CYKMap.size() - 1; i >= 0; i--) {
-            System.out.printf("| %d ", i);
+            sb.append(String.format("| %d ", i));
             for (int j = 0; j < CYKMap.size(); j++) {
                 if (i < j) {
-                    System.out.print("|     ");
+                    sb.append("|     ");
                 } else {
-                    System.out.print("|");
+                    sb.append("|");
                     ArrayList<String> cell = CYKMap.get(i).get(j);
                     if (cell.size() == 0) {
-                        System.out.print("  0  ");
+                        sb.append("  0  ");
                     } else {
-                        System.out.printf("%-5s", String.join(",", cell));
+                        sb.append(String.format("%-5s", String.join(",", cell)));
                     }
                 }
             }
-            System.out.println("|");
+            sb.append("|\n");
         }
 
         // Print the bottom separator
-        System.out.print("|---");
+        sb.append("|---");
         for (int i = 0; i < CYKMap.size(); i++) {
-            System.out.print("|-----");
+            sb.append("|-----");
         }
-        System.out.println("|");
-        return sb;
-    }
+        sb.append("|\n");
+
+        // Add end time and date stamp
+        sb.append("CYKMap print ended on: ").append(LocalDateTime.now().format(formatter)).append("\n");
+
+        // Send the output to the logger
+        logger.info(sb.toString());
+
+        return sb.toString();
+    } 
 
     public static ArrayList<ArrayList<ArrayList<String>>> CYKSquare(int i, int j, ArrayList<ArrayList<ArrayList<String>>> CYKMap, HashMap<String, ArrayList<Token>> Ruleset) {
         ArrayList<String> UnionedRules = new ArrayList<>();
