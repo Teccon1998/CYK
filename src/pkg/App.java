@@ -56,8 +56,10 @@ public class App {
         ArrayList<ArrayList<ArrayList<String>>> CYKMap = createCYKMap(inputString, hashMap, nonTermMap);
         if (CYKMap.get(CYKMap.size() - 1).get(0).contains(StartRule)) {
             System.out.println("THIS STRING IS IN THIS LANGUAGE.");
+            Logger.getGlobal().info("THIS STRING IS IN THIS LANGUAGE.");
         } else {
             System.out.println("THIS STRING IS NOT IN THE LANGUAGE.");
+            Logger.getGlobal().info("THIS STRING IS NOT IN THE LANGUAGE.");
         }
 
         LocalDateTime endTime = LocalDateTime.now();
