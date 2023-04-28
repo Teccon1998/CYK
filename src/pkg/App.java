@@ -131,6 +131,7 @@ public class App {
         }
 
         System.out.println("CYK MAP: ");
+        printCYKMAP(CYKMap);
         return CYKMap;
     }
 
