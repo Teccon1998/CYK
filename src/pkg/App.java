@@ -11,10 +11,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
+
 
 public class App {
     final static boolean LogSwitch = true; //Global logging switch.
@@ -36,7 +38,7 @@ public class App {
         ArrayList<Token> TokenList = Lex();
         String inputString = TokenList.remove(0).getValue();
         HashMap<String, ArrayList<Token>> hashMap = parse(TokenList);
-        String StartRule = "C";//TODO:Find the start rule from the tokenList
+        String StartRule = findStartRule(hashMap);
         HashMap<Character, ArrayList<String>> nonTermMap = NonTermMap(inputString, hashMap);
         if (terminalNotExistsFromInput(inputString, nonTermMap)) {
             try {
@@ -50,6 +52,7 @@ public class App {
                 System.exit(1);
             }
         }
+        System.out.println("Start Rule: " + StartRule);
         ArrayList<ArrayList<ArrayList<String>>> CYKMap = createCYKMap(inputString, hashMap, nonTermMap);
         if (CYKMap.get(CYKMap.size() - 1).get(0).contains(StartRule)) {
             System.out.println("THIS STRING IS IN THIS LANGUAGE.");
@@ -58,11 +61,28 @@ public class App {
         }
 
         LocalDateTime endTime = LocalDateTime.now();
-
+        logger.info("End of program.");
+        // log start rule
+        logger.info("Start rule: " + StartRule);
     // Calculate the time elapsed and log it
         Duration timeElapsed = Duration.between(startTime, endTime);
         logger.info("Time elapsed for the entire program: " + timeElapsed.toMillis() + " milliseconds");
     }
+
+    public static String findStartRule(HashMap<String, ArrayList<Token>> hashMap) {
+        // Start tends to have an epsilon transition, so we look for that first or it'll be the first rule typically
+        for (Map.Entry<String, ArrayList<Token>> entry : hashMap.entrySet()) {
+            ArrayList<Token> tokens = entry.getValue();
+            for (Token token : tokens) {
+                if (token.getTokenType().equals(Token.TokenType.EPSILON)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        // If no rule with an epsilon transition is found, return the first rule in the HashMap as the starting rule
+        return hashMap.keySet().iterator().next();
+    }
+    
 
     /*
      * This is super annoying implementation, but it WORKS!
@@ -111,8 +131,6 @@ public class App {
         }
 
         System.out.println("CYK MAP: ");
-        String x = printCYKMAP(CYKMap);
-
         return CYKMap;
     }
 
@@ -230,8 +248,6 @@ public class App {
         /*
          * Collect the strings from the input file.
          */
-
-        String username = System.getProperty("user.name");
         String projectDir = System.getProperty("user.dir");
         String grammarFilePath = "/tests/grammar.txt";
         grammarFilePath = grammarFilePath.replace("\\", "/");
