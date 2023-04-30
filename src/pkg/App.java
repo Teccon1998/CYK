@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 
 
 public class App {
+    
     final static boolean LogSwitch = true; //Global logging switch.
     static Logger logger = Logger.getGlobal();
     public static String StartRule = "";
+    
     public static void main(String[] args) throws Exception {
         /*
          * Logging Handler if logging is enabled
@@ -35,10 +37,17 @@ public class App {
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
         }
+       
         ArrayList<Token> TokenList = Lex();
         String inputString = TokenList.remove(0).getValue();
+        ArrayList<Token> TokenListStore = new ArrayList<>(TokenList);
         HashMap<String, ArrayList<Token>> hashMap = parse(TokenList);
         StartRule = findStartRule(hashMap);
+        if(StartRule == null)
+        {
+            StartRule = TokenListStore.get(0).getValue();
+        }
+        
         HashMap<Character, ArrayList<String>> nonTermMap = NonTermMap(inputString, hashMap);
         if (terminalNotExistsFromInput(inputString, nonTermMap)) {
             try {
@@ -61,8 +70,6 @@ public class App {
             System.out.println("THIS STRING IS NOT IN THE LANGUAGE.");
             Logger.getGlobal().info("THIS STRING IS NOT IN THE LANGUAGE.");
         }
-        // Get the starting rule
-        String startRule = getStartRule();
 
         LocalDateTime endTime = LocalDateTime.now();
         logger.info("End of program.");
@@ -84,12 +91,8 @@ public class App {
             }
         }
         // If no rule with an epsilon transition is found, return the first rule in the HashMap as the starting rule
-        return hashMap.keySet().iterator().next();
+        return null;
     }
-    public static String getStartRule() {
-        return StartRule;
-    }
-    
 
     /*
      * This is super annoying implementation, but it WORKS!
@@ -152,7 +155,7 @@ public class App {
 
         // Print the top row
         sb.append("|   ");
-        for (int i = 0; i < CYKMap.size(); i++) {
+        for (int i = 1; i < CYKMap.size(); i++) {
             sb.append(String.format("| %d   ", i));
         }
         sb.append("|\n");
@@ -165,7 +168,7 @@ public class App {
         sb.append("|\n");
 
         // Print the main table
-        for (int i = CYKMap.size() - 1; i >= 0; i--) {
+        for (int i = 0; i <= CYKMap.size()-1; i++) {
             sb.append(String.format("| %d ", i));
             for (int j = 0; j < CYKMap.size(); j++) {
                 if (i < j) {

@@ -1,5 +1,5 @@
 input:aabb
-C : AZ | epsilon
+C : AZ 
 S : AZ
 Z : SB | b
 A : a

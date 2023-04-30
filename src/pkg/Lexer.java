@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import static pkg.App.StartRule;
-import static pkg.App.getStartRule;
 import static pkg.Token.TokenType.*;
 
 public class Lexer {
@@ -39,7 +37,6 @@ public class Lexer {
         // log start char
         logger.info("Starting Lexing");
         // start state
-        logger.info( "Starting Rule: " + getStartRule());
         for (String str : this.UnlexedStrings) {
             /*
              * Need to loop over each character. Cases checking for every style of grammar input.
@@ -78,7 +75,7 @@ public class Lexer {
                             StringGrouping = new StringBuilder();
                             state = State.RULESET;
                         } else {
-                            LogOut(logger, "NO VALID RULE FOUND!!! EXITING!!!", "No valid rule found. Exiting. Start char: " +  App.getStartRule());
+                            LogOut(logger, "NO VALID RULE FOUND!!! EXITING!!!",null);
                         }
                     }
                     case RULESET -> {
