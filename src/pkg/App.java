@@ -25,10 +25,11 @@ public class App {
     public static String StartRule = "";
     
     public static void main(String[] args) throws Exception {
+        LocalDateTime startTime = LocalDateTime.now();
         /*
          * Logging Handler if logging is enabled
          */
-        LocalDateTime startTime = LocalDateTime.now();
+
         if (LogSwitch) {
             String projectDir = System.getProperty("user.dir");
             String logFilePath = projectDir + "/tests/Log.txt";
@@ -120,6 +121,7 @@ public class App {
             int p = 0;
             for (String str : nonTermMap.get(inputString.charAt(i))) {
                 p++;
+                // If there is only one rule for the non-terminal, don't add a comma
                 if (nonTermMap.get(inputString.charAt(i)).size() == 0) {
                     loggerString.append("0");
                 } else if (nonTermMap.get(inputString.charAt(i)).size() == 1) {
@@ -146,14 +148,14 @@ public class App {
     }
 
 
-    public static String printCYKMAP(ArrayList<ArrayList<ArrayList<String>>> CYKMap) {
+    public static void printCYKMAP(ArrayList<ArrayList<ArrayList<String>>> CYKMap) {
         StringBuilder sb = new StringBuilder();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         // Add start time and date stamp
         sb.append("CYKMap printed on: ").append(LocalDateTime.now().format(formatter)).append("\n");
 
-        // Print the top row
+        // Print the top row w/ column numbers
         sb.append("|   ");
         for (int i = 1; i < CYKMap.size(); i++) {
             sb.append(String.format("| %d   ", i));
@@ -163,27 +165,30 @@ public class App {
         // Print the separator
         sb.append("|---");
         for (int i = 0; i < CYKMap.size(); i++) {
-            sb.append("|-----");
+            sb.append("|-----"); // 5 dashes
         }
         sb.append("|\n");
 
         // Print the main table
         for (int i = 0; i <= CYKMap.size()-1; i++) {
+            // Print the leftmost column
             sb.append(String.format("| %d ", i));
+            // Print the contents of the row
             for (int j = 0; j < CYKMap.size(); j++) {
-                if (i < j) {
+                // if i < j, then we are in the upper triangle, so print empty cells
+                if (i < j) { // Print empty cells
                     sb.append("|     ");
-                } else {
-                    sb.append("|");
-                    ArrayList<String> cell = CYKMap.get(i).get(j);
+                } else { // Print the contents of the cell
+                    sb.append("|"); // Add the left separator
+                    ArrayList<String> cell = CYKMap.get(i).get(j); // Get the contents of the cell
                     if (cell.size() == 0) {
-                        sb.append("  0  ");
-                    } else {
+                        sb.append("  0  "); // Print a 0 if the cell is empty
+                    } else { // Print the contents of the cell
                         sb.append(String.format("%-5s", String.join(",", cell)));
                     }
                 }
             }
-            sb.append("|\n");
+            sb.append("|\n"); // Add the right separator
         }
 
         // Print the bottom separator
@@ -199,8 +204,7 @@ public class App {
         // Send the output to the logger
         logger.info(sb.toString());
 
-        return sb.toString();
-    } 
+    }
 
     public static ArrayList<ArrayList<ArrayList<String>>> CYKSquare(int i, int j, ArrayList<ArrayList<ArrayList<String>>> CYKMap, HashMap<String, ArrayList<Token>> Ruleset) {
         ArrayList<String> UnionedRules = new ArrayList<>();
