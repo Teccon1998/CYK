@@ -72,6 +72,12 @@ In this printout: i,j are our CYK coordinates. Use the column as your i and the 
 For the input string: (1,1:C),(2,2:C),(3,3:C),(4,4:D),(5,5:D),(6,6:D)
 For the final check, if you check (1,6:A,S) If the location 1,6 contains your start rule, which is S in this case, the string will be accepted.
 
+## NOTE
+```
+This code will only accept 1 grammar and input string at a time. You must completely change the grammar.txt file 
+in the tests folder to your new grammar and input string to test a new grammar and input string.
+```
+
 ## Authors
 
 CYK Parser created by Alexander Crowe, Gregory Vincent, Owen Sterling, Hana Kastrati, and Thomas Lloyd-Jones.
