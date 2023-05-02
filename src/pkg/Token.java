@@ -9,6 +9,7 @@ public class Token {
         this.str = str;
     }
 
+    //Token accessors and mutators
     public TokenType getTokenType() {
         return this.TokType;
     }
@@ -22,6 +23,7 @@ public class Token {
         return "Token(T:" + this.TokType + ", String:" + this.str + ")";
     }
 
+    //used to define each token
     public enum TokenType {
         TERMINAL, NONTERMINAL, EPSILON, ENDOFLINE, SEPARATOR, RULERELATION, INPUTSTRING
     }
