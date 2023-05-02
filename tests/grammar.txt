@@ -2,7 +2,7 @@ input:aabc
 S : AB | BC
 A : XA | a
 B : YZ | YD
-C : ZC | a
+C : ZC | c
 D : BZ
 X : a
 Y : b

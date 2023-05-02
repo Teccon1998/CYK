@@ -25,7 +25,7 @@ The expressions can be a mix of terminals, nonterminals, and the exact word `eps
 
 ## Dependencies
 
-This project uses Java 8 and does not have any external dependencies.
+This project uses Java 14 and does not have any external dependencies.
 
 ## Files
 
