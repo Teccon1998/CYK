@@ -41,7 +41,7 @@ Finally, the algorithm checks if the starting rule is in the last cell of the ta
 
 ## Authors
 
-CYK Parser created by Alexander Crowe, Gregory Vincent, and Thomas Lloyd-Jones.
+CYK Parser created by Alexander Crowe, Gregory Vincent, Owen Sterling, Hana Kastrati, and Thomas Lloyd-Jones.
 
 ## License
 
