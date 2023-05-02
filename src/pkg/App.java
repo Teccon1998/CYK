@@ -24,6 +24,9 @@ public class App {
     static Logger logger = Logger.getGlobal();
     public static String StartRule = "";
     
+    /*
+     * Longest algorithm is O(n^3) bringing the time complexity to O(n^3)
+     */
     public static void main(String[] args) throws Exception {
         LocalDateTime startTime = LocalDateTime.now();
         /*
@@ -38,7 +41,14 @@ public class App {
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
         }
-       
+        /*
+         * Here to line 84 is the entirety of the process. Scroll to each method to see what it does.
+         * We lex our tokens, remove the first token to store our input string which is lexed.
+         * We store the tokens in a copy of the array for debugging and usage to find the start rule after parsing.
+         * We find our start rule and if there is no epsilon in the rule then we collect the first rule found.
+         * We create a map of our nonterminals to our terminals. We do this so we can easily collect our rules for each character.
+         * When we create our first row of the CYK we no longer need the nonterminal map. 
+         */
         ArrayList<Token> TokenList = Lex();
         String inputString = TokenList.remove(0).getValue();
         ArrayList<Token> TokenListStore = new ArrayList<>(TokenList);
@@ -81,6 +91,11 @@ public class App {
         logger.info("Time elapsed for the entire program: " + timeElapsed.toMillis() + " milliseconds");
     }
 
+    /*
+     * Check the hashmap of the rules by looking at the entry value and if the nonterminal contains an epsilon then we can assume its our start rule
+     * If no epsilon is found we return null.
+     * O(n)
+     */
     public static String findStartRule(HashMap<String, ArrayList<Token>> hashMap) {
         // Start tends to have an epsilon transition, so we look for that first or it'll be the first rule typically
         for (Map.Entry<String, ArrayList<Token>> entry : hashMap.entrySet()) {
@@ -96,8 +111,10 @@ public class App {
     }
 
     /*
-     * This is super annoying implementation, but it WORKS!
-     * You initalize the first row. Then call
+     * To create our CYK map we need to create a 3 dimensional arrayList. 
+     * We create a coordinate map where each location on the map has an arraylist to store the resulting rules from our
+     * cartesian product, and in that array store the list of rules that correspond to that cell's particular cartesian product.
+     * O(n log n)
      */
     public static ArrayList<ArrayList<ArrayList<String>>> createCYKMap(String inputString, HashMap<String, ArrayList<Token>> hashMap, HashMap<Character, ArrayList<String>> nonTermMap) {
         ArrayList<ArrayList<ArrayList<String>>> CYKMap = new ArrayList<>();
@@ -156,30 +173,41 @@ public class App {
         sb.append("CYKMap printed on: ").append(LocalDateTime.now().format(formatter)).append("\n");
 
         // Print the top row w/ column numbers
-        sb.append("|   ");
-        for (int i = 1; i < CYKMap.size(); i++) {
-            sb.append(String.format("| %d   ", i));
+        sb.append(" |   ");
+        for (int i = 1; i < CYKMap.size()+1; i++) {
+            sb.append(String.format(" | %d   ", i));
         }
-        sb.append("|\n");
+        sb.append("|i\n");
 
         // Print the separator
-        sb.append("|---");
+        sb.append(" |---");
         for (int i = 0; i < CYKMap.size(); i++) {
-            sb.append("|-----"); // 5 dashes
+            sb.append(" |-----"); // 5 dashes
         }
         sb.append("|\n");
 
         // Print the main table
         for (int i = 0; i <= CYKMap.size()-1; i++) {
             // Print the leftmost column
-            sb.append(String.format("| %d ", i));
+            /* This if else ensures that the "j" is placed to the left of the first column, ensuring that you can see 
+             * how the coordinate system works.
+            */
+            if(i==0)
+            {
+                sb.append(String.format("j| %d ",i+1));
+            }
+            else
+            {
+                sb.append(String.format(" | %d ", i+1));
+            }
+            
             // Print the contents of the row
             for (int j = 0; j < CYKMap.size(); j++) {
                 // if i < j, then we are in the upper triangle, so print empty cells
                 if (i < j) { // Print empty cells
-                    sb.append("|     ");
+                    sb.append(" |     ");
                 } else { // Print the contents of the cell
-                    sb.append("|"); // Add the left separator
+                    sb.append(" |"); // Add the left separator
                     ArrayList<String> cell = CYKMap.get(i).get(j); // Get the contents of the cell
                     if (cell.size() == 0) {
                         sb.append("  0  "); // Print a 0 if the cell is empty
@@ -192,9 +220,9 @@ public class App {
         }
 
         // Print the bottom separator
-        sb.append("|---");
+        sb.append(" |---");
         for (int i = 0; i < CYKMap.size(); i++) {
-            sb.append("|-----");
+            sb.append(" |-----");
         }
         sb.append("|\n");
 
@@ -206,14 +234,20 @@ public class App {
 
     }
 
+    /*
+     * For loops create indicies of appropriate squares for cartesianed rules. 
+     * O(n^3)
+     */
     public static ArrayList<ArrayList<ArrayList<String>>> CYKSquare(int i, int j, ArrayList<ArrayList<ArrayList<String>>> CYKMap, HashMap<String, ArrayList<Token>> Ruleset) {
         ArrayList<String> UnionedRules = new ArrayList<>();
         int l = i;
         int log = i + 1;
         StringBuilder cartesianLog = new StringBuilder("Cartesian of X_" + (l + 1) + "," + (i + 1) + " and X_" + (j + 1) + "," + (log + 1) + ": ");
         for (int m = i + 1; m <= j; m++) {
+            //Takes the appropriate locations of the two squares to be unioned and simply appends the strings together.
             ArrayList<String> CartesianedRules = cartesian(CYKMap.get(l).get(i), CYKMap.get(j).get(m));
-
+            //For each string in the Cartesianed Rules we appened it to the unioned rules,
+            //Once we are done with our unioned rules we continue on with logging.
             for (String string : CartesianedRules) {
                 cartesianLog.append(string).append(", ");
                 UnionedRules.add(string);
@@ -230,7 +264,17 @@ public class App {
 
         StringBuilder loggerRuleExists = new StringBuilder("Rules containing Cartesian: ");
         int logString = loggerRuleExists.length();
-
+        /*
+         * For each string in our unioned rules we check each key, we take that key, 
+         * and for each value from that key we get a token.
+         * 
+         * We take that token and if our token's string value is equal to our unioned rule's value
+         * We check and see if that value is already in the keymap. If so we can skip it saving us a bit of time
+         * on our get and add. If not we add it to our cyk map at the appropriate location.
+         * 
+         * Once we find our rule regardless of if its in the CYK or not we break because we dont need
+         * to check the rest of that token's rules. Saving us more time.
+         */
         for (String str : UnionedRules) {
             for (String s : Ruleset.keySet()) {
                 for (Token t : Ruleset.get(s)) {
@@ -244,32 +288,38 @@ public class App {
                 }
             }
         }
+        //Once we reach here the CYK map should be finished.
+        //below is entirely for logging.
         if (loggerRuleExists.length() == logString) {
             loggerRuleExists.append("NULL");
         } else {
             loggerRuleExists = new StringBuilder(loggerRuleExists.substring(0, loggerRuleExists.length() - 2));
         }
+
         logger.info(loggerRuleExists.toString());
         logger.info("Adding these to location: X_" + (i + 1) + "," + (j + 1));
         return CYKMap;
     }
 
-
+    /*
+     * O(n)
+     */
     public static ArrayList<Token> Lex() throws IOException {
-        /*
-         * Start of CYK program
-         */
+
 
         /*
          * Collect the strings from the input file.
+         * Collection from the grammar file is done using the compilation and testing subfolder.
          */
         String projectDir = System.getProperty("user.dir");
         String grammarFilePath = "/tests/grammar.txt";
         grammarFilePath = grammarFilePath.replace("\\", "/");
         grammarFilePath = projectDir + grammarFilePath;
 
+        //Get an arraylist of strings from the grammar file. \n delimits a new element in the arraylist.
         Path path = Paths.get(grammarFilePath);
         ArrayList<String> UnlexedStrings = new ArrayList<>(Files.readAllLines(path));
+
         //Logs unlexed strings
         if (LogSwitch) {
             logger.info("UnlexedStrings:");
@@ -278,7 +328,8 @@ public class App {
             }
         }
         /*
-         * Lexes the strings input from the file.
+         * Lexes the strings input from the file using Lexer.java
+         * and the LexerObj.Lex(); method.
          */
         Lexer lexer = new Lexer(UnlexedStrings, logger);
         ArrayList<Token> TokenList = new ArrayList<>();
@@ -302,13 +353,19 @@ public class App {
         }
         return TokenList;
     }
-
+    /*
+     * Creates a parse object and calls parse on that object. 
+     * Everything else is error checking
+     * O(n^3)
+     */
     public static HashMap<String, ArrayList<Token>> parse(ArrayList<Token> TokenList) throws Exception {
         //Parses each line into a hashmap of rules.
         Parser parser = new Parser(TokenList, logger);
         HashMap<String, ArrayList<Token>> hashMap = parser.parse();
         /*
          * Checking that for each ruleset there exists a correpsonding key rule.
+         * We do this so there are no null values and no rules with only epsilon moves.
+         * This is primarily for errorchecking.
          */
         for (String s : hashMap.keySet()) {
             ArrayList<Token> ruleSetForRule = hashMap.get(s);
@@ -348,7 +405,12 @@ public class App {
         }
         return hashMap;
     }
-
+    /*
+     * Creates a map relating where each nonterminal is and the rules they exist in.
+     * This is a helper function that for each terminal we can do a quick
+     * O(1) lookup for its rules.
+     * O(n log n)
+     */
     public static HashMap<Character, ArrayList<String>> NonTermMap(String inputString, HashMap<String, ArrayList<Token>> hashMap) {
         /*
          * Input string for CYK algorithm.
@@ -380,7 +442,7 @@ public class App {
         return nonTermMap;
     }
 
-
+    //Lambda function to collect and create a map of all the strings. 
     public static ArrayList<String> cartesian(ArrayList<String> arr1, ArrayList<String> arr2) {
         // Returns the cartesian product of two arraylists.
         return arr1.stream()
@@ -388,7 +450,8 @@ public class App {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-
+    //Ensures that every terminal in the input string is contained within the map. 
+    //if there's no terminal from the inputstring corresponding to the terminals in the nonTermMap then we have an invalid inputString.
     public static boolean terminalNotExistsFromInput(String inpuString, HashMap<Character, ArrayList<String>> nonTermMap) {
         // Checks if the input string contains a terminal that is not in the grammar.
         for (char c : inpuString.toCharArray())

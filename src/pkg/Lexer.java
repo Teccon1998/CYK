@@ -107,6 +107,9 @@ public class Lexer {
                 }
 
             }
+            //End of loop because we've reached end of line.
+            //This checks if the StringGrouping is not empty and we create a token at the end depending on the case
+            //of the string in StringGrouping, and then concatenate an End of Line token.
             if (StringGrouping.length() != 0) {
                 if (Character.isLowerCase(StringGrouping.charAt(0))) {
                     TokenList.add(new Token(TERMINAL, StringGrouping.toString()));
@@ -117,6 +120,8 @@ public class Lexer {
                 }
                 TokenList.add(new Token(ENDOFLINE, "EOL"));
             }
+            //We look through every token and see if any of the strings contain the string epsilon. 
+            //If it does then we change it to an epsilon token and then return the token list
             for (int i = 0; i < TokenList.size(); i++) {
                 if (TokenList.get(i).getValue().equalsIgnoreCase("epsilon")) {
                     TokenList.set(i, new Token(EPSILON, "EPSILON"));
