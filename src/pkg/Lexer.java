@@ -1,5 +1,6 @@
 package pkg;
 
+//Printwriter, Stringwriter and logger are used to troubleshoot as the program runs
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -45,10 +46,12 @@ public class Lexer {
              */
             StringBuilder StringGrouping = new StringBuilder();
             State state = State.INPUTSTRING;
+            //check for the input string before beginning to lex
             if (TokenList.size() != 0 && TokenList.get(0).getTokenType().equals(INPUTSTRING)) {
                 state = State.START;
             }
             for (int i = 0; i < str.length(); i++) {
+                //track and categorize each character per input string
                 char c = str.charAt(i);
                 switch (state) {
                     case INPUTSTRING -> {
