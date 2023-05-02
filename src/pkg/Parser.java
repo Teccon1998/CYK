@@ -29,7 +29,7 @@ public class Parser {
         return TokenList.get(0);
     }
 
-    //Recursively check for rules. Only adds if nonnull.
+    //Recursively check for rules, limitation is that there is no checking for null.
     public HashMap<String, ArrayList<Token>> parse() throws Exception {
         HashMap<String, ArrayList<Token>> hashMap = new HashMap<>();
         while (TokenList.size() != 0) {
@@ -39,6 +39,7 @@ public class Parser {
     }
 
     //Recursively checks for each token and builds hashmap for later rule lookups.
+    //We do this so we can have a map for O(1) lookups.
     public HashMap<String, ArrayList<Token>> RuleRow() throws Exception {
         HashMap<String, ArrayList<Token>> RuleSet = new HashMap<>();
         ArrayList<Token> Rules = new ArrayList<>();

@@ -1,6 +1,9 @@
-input:aaabbb
-A : CD | CB | epsilon
-S : CD | CB
-B : SD
-C : a
-D : b
+input:aabc
+S : AB | BC
+A : XA | a
+B : YZ | YD
+C : ZC | a
+D : BZ
+X : a
+Y : b
+Z : c
